@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wezvatech-clusterip
+  namespace: wezvatech
+spec:
+  type: ClusterIP
+  selector:
+    env: mentos-deployment
+  ports:
+    - protocol: TCP
+      port: 80          
+      targetPort: 80    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wezvatech-nodeport
+  namespace: wezvatech
+spec:
+  type: NodePort
+  selector:
+    env: mentos-deployment
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30001  
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wezvatech-loadbalancer
+  namespace: wezvatech
+spec:
+  type: LoadBalancer
+  selector:
+    env: mentos-deployment
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
