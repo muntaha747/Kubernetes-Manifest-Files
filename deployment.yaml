@@ -200,4 +200,4 @@ spec:
             name: wezvatech-configmap
         - name: wezvatech-secrets
           secret:
-            name: wezvatech-secrets
+            secretName: wezvatech-secrets
