@@ -4,7 +4,7 @@ metadata:
   name: wezvatech-deployment
   namespace: wezvatech
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       env: mentos-deployment
@@ -62,9 +62,11 @@ spec:
             - name: wezvatech-persistent-volume
               mountPath: /dev/vol 
             - name: config-volume
-              mountPath: /etc/virtualmemory
+              mountPath: /etc/virtualmemory/app.properties
+              subPath: app.properties
             - name: wezvatech-secrets
-              mountPath: /etc/virtualmemory
+              mountPath: /etc/virtualmemory/secret-data
+              subPath: secret-data
         
         - name: application-container
           image: ubuntu/nginx:latest
@@ -113,9 +115,11 @@ spec:
             - name: wezvatech-persistent-volume
               mountPath: /dev/vol 
             - name: config-volume
-              mountPath: /etc/virtualmemory
+              mountPath: /etc/virtualmemory/app.properties
+              subPath: app.properties
             - name: wezvatech-secrets
-              mountPath: /etc/virtualmemory
+              mountPath: /etc/virtualmemory/secret-data
+              subPath: secret-data
 
         - name: sidecar-container
           image: alpine:latest
@@ -164,9 +168,11 @@ spec:
             - name: wezvatech-persistent-volume
               mountPath: /dev/vol     
             - name: config-volume
-              mountPath: /etc/virtualmemory
+              mountPath: /etc/virtualmemory/app.properties
+              subPath: app.properties
             - name: wezvatech-secrets
-              mountPath: /etc/virtualmemory
+              mountPath: /etc/virtualmemory/secret-data
+              subPath: secret-data
 
       volumes:
         - name: emptydir
