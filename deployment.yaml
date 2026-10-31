@@ -1,0 +1,85 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: wezvatech-deployment
+spec:
+  replicas: 3
+  selector:
+    matachLabels:
+        env: mentos-deployment
+  template:
+    metadata:
+      name: techie-pods
+    labels:
+      env: mentos-deployment
+    spec:
+      containers:
+        - name: init-container
+          image: ubuntu:latest
+          ports:
+            - containerPort: 80
+          command: ["/bin/bash", "-c", "echo This is the init container; sleep 5; done"]
+          resources:
+            requests:
+              memory: "400Mi"
+              cpu: "100m"
+            limit:
+              memory: "1024Mi"
+              cpu: "200m"
+          env:
+            - name: ENV
+              value: STAGE
+            - name: SESSION
+              value: PODS
+          livenessProbe:
+            exec:
+              command:
+                - ls
+                - echo  "Hello your livelinessProbe is working fine and the app is live"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - ls
+                - echo "Hello your readinessProbe is working perfectly and you application is ready"
+            initialDelaySeconds: 12
+            periodSeconds: 4
+            timeoutSeconds: 10
+
+        - name: application-containe
+          image: 
+          ports:
+            - containerPort: 80
+          command: ["/bin/bash", "-c", "echo This is the init container; sleep 5; done"]
+          resources:
+            requests:
+              memory: "400Mi"
+              cpu: "100m"
+            limit:
+              memory: "1024Mi"
+              cpu: "200m"
+          env:
+            - name: ENV
+              value: STAGE
+            - name: SESSION
+              value: PODS
+          livenessProbe:
+            exec:
+              command:
+                - ls
+                - echo  "Hello your livelinessProbe is working fine and the app is live"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - ls
+                - echo "Hello your readinessProbe is working perfectly and you application is ready"
+            initialDelaySeconds: 12
+            periodSeconds: 4
+            timeoutSeconds: 10
+  
+
