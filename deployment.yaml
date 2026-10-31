@@ -2,6 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: wezvatech-deployment
+  namespace: wezvatech
 spec:
   replicas: 3
   selector:
@@ -27,10 +28,18 @@ spec:
               memory: "1024Mi"
               cpu: "200m"
           env:
-            - name: ENV
-              value: STAGE
             - name: SESSION
               value: PODS
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: wezvatech-configmap
+                  key: ENV
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: wezvatech-configmap
+                  key: LOG_LEVEL
           livenessProbe:
             exec:
               command:
@@ -52,6 +61,8 @@ spec:
               mountPath: /dev/empvol
             - name: wezvatech-persistent-volume
               mountPath: /dev/vol 
+            - name: config-volume
+              mountPath: /etc/config
         
         - name: application-container
           image: ubuntu/nginx:latest
@@ -66,10 +77,18 @@ spec:
               memory: "1024Mi"
               cpu: "200m"
           env:
-            - name: ENV
-              value: STAGE
             - name: SESSION
               value: PODS
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: wezvatech-configmap
+                  key: ENV
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: wezvatech-configmap
+                  key: LOG_LEVEL
           livenessProbe:
             exec:
               command:
@@ -91,6 +110,8 @@ spec:
               mountPath: /dev/empvol
             - name: wezvatech-persistent-volume
               mountPath: /dev/vol 
+            - name: config-volume
+              mountPath: /etc/config
 
         - name: sidecar-container
           image: alpine:latest
@@ -105,10 +126,18 @@ spec:
               memory: "1024Mi"
               cpu: "200m"
           env:
-            - name: ENV
-              value: STAGE
             - name: SESSION
               value: PODS
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: wezvatech-configmap
+                  key: ENV
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: wezvatech-configmap
+                  key: LOG_LEVEL
           livenessProbe:
             exec:
               command:
@@ -130,6 +159,8 @@ spec:
               mountPath: /dev/empvol
             - name: wezvatech-persistent-volume
               mountPath: /dev/vol     
+            - name: config-volume
+              mountPath: /etc/config
 
       volumes:
         - name: emptydir
@@ -137,3 +168,6 @@ spec:
         - name: wezvatech-persistent-volume
           persistentVolumeClaim:
             claimName: wezvatech-pvc
+        - name: config-volume
+          configMap:
+            name: wezvatech-configmap
