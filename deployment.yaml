@@ -18,7 +18,8 @@ spec:
           image: alpine:latest
           ports:
             - containerPort: 80
-          command: ["/bin/bash", "-c", "echo This is the init container; sleep 5"]
+          
+          command: ["/bin/sh", "-c", "echo This is the init container; sleep 5"]
           resources:
             requests:
               memory: "400Mi"
@@ -47,7 +48,13 @@ spec:
             initialDelaySeconds: 12
             periodSeconds: 4
             timeoutSeconds: 10
+          volumeMounts: 
+            - name: emptydir
+              mountPath: /dev/empvol
 
+            - name: wezvatech-persistent-volume
+              mountPath: /dev/vol 
+        
         - name: application-container
           image: ubuntu/nginx:latest
           ports:
@@ -81,12 +88,19 @@ spec:
             initialDelaySeconds: 12
             periodSeconds: 4
             timeoutSeconds: 10
+          volumeMounts: 
+            - name: emptydir
+              mountPath: /dev/empvol
+            
+            - name: wezvatech-persistent-volume
+              mountPath: /dev/vol 
 
         - name: sidecar-container
           image: alpine:latest
           ports:
             - containerPort: 80
-          command: ["/bin/bash", "-c", "echo 'This is the sidecar-container' > index.html; sleep 5"]
+         
+          command: ["/bin/sh", "-c", "echo 'This is the sidecar-container' > index.html; sleep 5"]
           resources:
             requests:
               memory: "400Mi"
@@ -114,4 +128,18 @@ spec:
                 - echo "Hello your readinessProbe is working perfectly and your sidecar container is ready"
             initialDelaySeconds: 12
             periodSeconds: 4
-            timeoutSeconds: 10    
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: emptydir
+              mountPath: /dev/empvol
+
+            - name: wezvatech-persistent-volume
+              mountPath: /dev/vol     
+
+      volumes:
+        - name: emptydir
+          emptyDir: {}
+
+        - name: wezvatech-persistent-volume
+          persistentVolumeClaim:
+            claimName: wezvatech-pvc
