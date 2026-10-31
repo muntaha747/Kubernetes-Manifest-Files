@@ -62,7 +62,9 @@ spec:
             - name: wezvatech-persistent-volume
               mountPath: /dev/vol 
             - name: config-volume
-              mountPath: /etc/config
+              mountPath: /etc/virtualmemory
+            - name: wezvatech-secrets
+              mountPath: /etc/virtualmemory
         
         - name: application-container
           image: ubuntu/nginx:latest
@@ -111,7 +113,9 @@ spec:
             - name: wezvatech-persistent-volume
               mountPath: /dev/vol 
             - name: config-volume
-              mountPath: /etc/config
+              mountPath: /etc/virtualmemory
+            - name: wezvatech-secrets
+              mountPath: /etc/virtualmemory
 
         - name: sidecar-container
           image: alpine:latest
@@ -160,7 +164,9 @@ spec:
             - name: wezvatech-persistent-volume
               mountPath: /dev/vol     
             - name: config-volume
-              mountPath: /etc/config
+              mountPath: /etc/virtualmemory
+            - name: wezvatech-secrets
+              mountPath: /etc/virtualmemory
 
       volumes:
         - name: emptydir
@@ -171,3 +177,6 @@ spec:
         - name: config-volume
           configMap:
             name: wezvatech-configmap
+        - name: wezvatech-secrets
+          secret:
+            name: wezvatech-secrets
