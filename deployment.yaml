@@ -5,25 +5,25 @@ metadata:
 spec:
   replicas: 3
   selector:
-    matachLabels:
-        env: mentos-deployment
+    matchLabels:
+      env: mentos-deployment
   template:
     metadata:
       name: techie-pods
-    labels:
-      env: mentos-deployment
+      labels:
+        env: mentos-deployment
     spec:
       containers:
         - name: init-container
-          image: ubuntu:latest
+          image: alpine:latest
           ports:
             - containerPort: 80
-          command: ["/bin/bash", "-c", "echo This is the init container; sleep 5; done"]
+          command: ["/bin/bash", "-c", "echo This is the init container; sleep 5"]
           resources:
             requests:
               memory: "400Mi"
               cpu: "100m"
-            limit:
+            limits:
               memory: "1024Mi"
               cpu: "200m"
           env:
@@ -35,7 +35,7 @@ spec:
             exec:
               command:
                 - ls
-                - echo  "Hello your livelinessProbe is working fine and the app is live"
+                - echo "Hello your livenessProbe is working fine and the app container is live"
             initialDelaySeconds: 10
             periodSeconds: 5
             timeoutSeconds: 10
@@ -43,21 +43,21 @@ spec:
             exec:
               command:
                 - ls
-                - echo "Hello your readinessProbe is working perfectly and you application is ready"
+                - echo "Hello your readinessProbe is working perfectly and your app container is ready"
             initialDelaySeconds: 12
             periodSeconds: 4
             timeoutSeconds: 10
 
-        - name: application-containe
-          image: 
+        - name: application-container
+          image: ubuntu/nginx:latest
           ports:
             - containerPort: 80
-          command: ["/bin/bash", "-c", "echo This is the init container; sleep 5; done"]
+          command: ["/bin/bash", "-c", "echo 'This is the main application container' > index.html; sleep 5"]
           resources:
             requests:
               memory: "400Mi"
               cpu: "100m"
-            limit:
+            limits:
               memory: "1024Mi"
               cpu: "200m"
           env:
@@ -69,7 +69,7 @@ spec:
             exec:
               command:
                 - ls
-                - echo  "Hello your livelinessProbe is working fine and the app is live"
+                - echo "Hello your livenessProbe is working fine and the app is live"
             initialDelaySeconds: 10
             periodSeconds: 5
             timeoutSeconds: 10
@@ -77,9 +77,41 @@ spec:
             exec:
               command:
                 - ls
-                - echo "Hello your readinessProbe is working perfectly and you application is ready"
+                - echo "Hello your readinessProbe is working perfectly and your application is ready"
             initialDelaySeconds: 12
             periodSeconds: 4
             timeoutSeconds: 10
-  
 
+        - name: sidecar-container
+          image: alpine:latest
+          ports:
+            - containerPort: 80
+          command: ["/bin/bash", "-c", "echo 'This is the sidecar-container' > index.html; sleep 5"]
+          resources:
+            requests:
+              memory: "400Mi"
+              cpu: "100m"
+            limits:
+              memory: "1024Mi"
+              cpu: "200m"
+          env:
+            - name: ENV
+              value: STAGE
+            - name: SESSION
+              value: PODS
+          livenessProbe:
+            exec:
+              command:
+                - ls
+                - echo "Hello your livenessProbe is working fine and the sidecar is live"
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - ls
+                - echo "Hello your readinessProbe is working perfectly and your sidecar container is ready"
+            initialDelaySeconds: 12
+            periodSeconds: 4
+            timeoutSeconds: 10    
