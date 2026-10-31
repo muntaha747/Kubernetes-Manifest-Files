@@ -14,7 +14,7 @@ spec:
       labels:
         env: mentos-deployment
     spec:
-      containers:
+      initContainers:
         - name: init-container
           image: alpine:latest
           ports:
@@ -40,22 +40,6 @@ spec:
                 configMapKeyRef:
                   name: wezvatech-configmap
                   key: LOG_LEVEL
-          livenessProbe:
-            exec:
-              command:
-                - ls
-                - echo "Hello your livenessProbe is working fine and the app container is live"
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            timeoutSeconds: 10
-          readinessProbe:
-            exec:
-              command:
-                - ls
-                - echo "Hello your readinessProbe is working perfectly and your app container is ready"
-            initialDelaySeconds: 12
-            periodSeconds: 4
-            timeoutSeconds: 10
           volumeMounts: 
             - name: emptydir
               mountPath: /dev/empvol
@@ -67,12 +51,13 @@ spec:
             - name: wezvatech-secrets
               mountPath: /etc/virtualmemory/secret-data
               subPath: secret-data
-        
+
+      containers:
         - name: application-container
           image: ubuntu/nginx:latest
           ports:
             - containerPort: 80
-          command: ["/bin/bash", "-c", "echo 'This is the main application container' > index.html; sleep 5"]
+          # No command here! This allows Nginx to start automatically.
           resources:
             requests:
               memory: "400Mi"
@@ -96,16 +81,18 @@ spec:
           livenessProbe:
             exec:
               command:
-                - ls
-                - echo "Hello your livenessProbe is working fine and the app is live"
+                - /bin/sh
+                - -c
+                - "echo 'Hello your livenessProbe is working fine and the app is live'"
             initialDelaySeconds: 10
             periodSeconds: 5
             timeoutSeconds: 10
           readinessProbe:
             exec:
               command:
-                - ls
-                - echo "Hello your readinessProbe is working perfectly and your application is ready"
+                - /bin/sh
+                - -c
+                - "echo 'Hello your readinessProbe is working perfectly and your application is ready'"
             initialDelaySeconds: 12
             periodSeconds: 4
             timeoutSeconds: 10
@@ -125,7 +112,8 @@ spec:
           image: alpine:latest
           ports:
             - containerPort: 80
-          command: ["/bin/sh", "-c", "echo 'This is the sidecar-container' > index.html; sleep 5"]
+          # The sidecar needs a command to stay alive, otherwise Alpine exits and crashes.
+          command: ["/bin/sh", "-c", "sleep infinity"]
           resources:
             requests:
               memory: "400Mi"
@@ -149,16 +137,18 @@ spec:
           livenessProbe:
             exec:
               command:
-                - ls
-                - echo "Hello your livenessProbe is working fine and the sidecar is live"
+                - /bin/sh
+                - -c
+                - "echo 'Hello your livenessProbe is working fine and the sidecar is live'"
             initialDelaySeconds: 10
             periodSeconds: 5
             timeoutSeconds: 10
           readinessProbe:
             exec:
               command:
-                - ls
-                - echo "Hello your readinessProbe is working perfectly and your sidecar container is ready"
+                - /bin/sh
+                - -c
+                - "echo 'Hello your readinessProbe is working perfectly and your sidecar container is ready'"
             initialDelaySeconds: 12
             periodSeconds: 4
             timeoutSeconds: 10
